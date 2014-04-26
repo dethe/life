@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>Life</title>
+	<style>
+		html, body{
+			height: 100%;
+			margin: 0;
+			padding: 0;
+		}
+		h2{
+			position: absolute;
+			margin: 0;
+			bottom: 20px;
+			left: 20px;
+			color: rgba(1,1,1,.5);
+		}
+	</style>
+</head>
+<body>
+	<h2>Generation <span class="gens">0</span> with <span class="live">0</span> live cells</h2>
+	<canvas width="500" height="500"></canvas>
+	<script>
+	(function(){
+		var canvas, ctx, gens, live, cells, WIDTH, HEIGHT, DWIDTH, DHEIGHT, MAX;
+		function init(){
+			DWIDTH = Math.min(800, window.innerWidth);
+			DHEIGHT = window.innerHeight;
+			WIDTH = Math.floor(DWIDTH / 5);
+			HEIGHT = Math.floor(DHEIGHT / 5);
+			canvas = document.querySelector('canvas');
+			canvas.setAttribute('width', DWIDTH);
+			canvas.setAttribute('height', DHEIGHT);
+			ctx = canvas.getContext('2d');
+			gens = document.querySelector('.gens');
+			live = document.querySelector('.live');
+			cells = [];
+			MAX = WIDTH * HEIGHT;
+			for (var i = 0; i < MAX; i++){
+				cells.push(!!(Math.random() > 0.9));
+			}
+		}
+		init();
+		var gen = 0;
+		function frame(){
+			gen++;
+			setTimeout(frame, 100);
+			drawCells();
+			updateCells();
+			var count = cells.filter(isTrue).length;
+			gens.textContent = gen;
+			live.textContent = count;
+		}
+		frame();
+		function updateCells(){
+			cells = cells.map(generation);
+		}
+		function drawCells(){
+			ctx.clearRect(0,0,DWIDTH,DHEIGHT);
+			ctx.beginPath();
+			cells.forEach(draw);
+			ctx.fill();
+		}
+		function draw(val, idx){
+			if (!val) return;
+			var pt = indexToPoint(idx);
+			var x = pt.x * 5 + 2.5;
+			var y = pt.y * 5 + 2.5;
+			var r = 2;
+			ctx.moveTo(x,y);
+			ctx.arc(x,y,r,0, Math.PI * 2);
+		}
+		function generation(value, idx){
+			// var nc = neighboursCount(idx);
+			var nc = neighboursWrappedCount(idx);
+			return (nc === 3) || (value && nc === 2)
+		}
+		// how many neighbours are live?
+		function neighboursCount(idx){
+			var neighbourCells = neighbours(idx).filter(edgesFilter).map(toCell);
+			return count(neighbourCells, isTrue);
+		}
+		function neighbours(idx){
+			var pt = indexToPoint(idx);
+			return [
+				{x: pt.x - 1, y: pt.y - 1},
+				{x: pt.x,     y: pt.y - 1},
+				{x: pt.x + 1, y: pt.y - 1},
+				{x: pt.x - 1, y: pt.y},
+				{x: pt.x + 1, y: pt.y},
+				{x: pt.x - 1, y: pt.y + 1},
+				{x: pt.x,     y: pt.y + 1},
+				{x: pt.x + 1, y: pt.y + 1}
+			];			
+		}
+		function count(list, filter){
+			return list.filter(filter).length;
+		}
+		function isTrue(item){
+			return !!item;
+		}
+		function edgesFilter(pt){
+			if (pt.x < 0) return false;
+			if (pt.y < 0) return false;
+			if (pt.x >= WIDTH) return false;
+			if (pt.y >= HEIGHT) return false;
+			return true;
+		}
+		function toCell(pt){
+			return cells[pointToIndex(pt)];
+		}
+		// how many neighbours are live, counting wrapped around the board
+		function neighboursWrappedCount(idx){
+			var neighbourCells = neighbours(idx).map(wrap).map(toCell);
+			return count(neighbourCells, isTrue);
+		}
+		function wrap(pt){
+			return {
+				x: (pt.x + WIDTH) % WIDTH,
+				y: (pt.y + HEIGHT) % HEIGHT
+			}
+		}
+		function indexToPoint(idx){
+			return {
+				x: (idx % WIDTH),
+				y: Math.floor(idx / WIDTH) 
+			}
+		}
+		function pointToIndex(pt){
+			return pt.y * WIDTH + pt.x;
+		}
+	})();
+	</script>
+</body>
+</html>
