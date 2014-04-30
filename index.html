@@ -23,7 +23,7 @@
 	<canvas width="500" height="500"></canvas>
 	<script>
 	(function(){
-		var canvas, ctx, gens, live, cells, WIDTH, HEIGHT, DWIDTH, DHEIGHT, MAX;
+		var canvas, ctx, gens, live, cells, WIDTH, HEIGHT, DWIDTH, DHEIGHT, MAX, lastsignature;
 		function init(){
 			DWIDTH = Math.min(800, window.innerWidth);
 			DHEIGHT = window.innerHeight;
@@ -37,6 +37,8 @@
 			live = document.querySelector('.live');
 			cells = [];
 			MAX = WIDTH * HEIGHT;
+			lastsignature = '0';
+			signature = '0';
 			for (var i = 0; i < MAX; i++){
 				cells.push(!!(Math.random() > 0.9));
 			}
@@ -45,14 +47,24 @@
 		var gen = 0;
 		function frame(){
 			gen++;
-			setTimeout(frame, 100);
 			drawCells();
 			updateCells();
+			var nextsignature = getSignature();
+			if (nextsignature === signature || nextsignature === lastsignature){
+				console.log(nextsignature);
+				return;
+			}
+			setTimeout(frame, 100);
+			lastsignature = signature;
+			signature = nextsignature;
 			var count = cells.filter(isTrue).length;
 			gens.textContent = gen;
 			live.textContent = count;
 		}
 		frame();
+		function getSignature(){
+			return cells.map(function(cell){return cell ? 1 : 0;}).join('');
+		}
 		function updateCells(){
 			cells = cells.map(generation);
 		}
