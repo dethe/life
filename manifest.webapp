@@ -3,9 +3,9 @@
   "description":"Conway's Game of Life",
   "version":"1.0",
   "icons":{
-    "16":"icon_16.png",
-    "48":"icon_48.png",
-    "128":"icon_128.png"
+    "16":"http://dethe.github.io/life/icon_16.png",
+    "48":"http://dethe.github.io/life/icon_48.png",
+    "128":"http://dethe.github.io/life/icon_128.png"
   },
   "installs_allowed_from":[
     "*"
