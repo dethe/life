@@ -1,0 +1,17 @@
+{
+  "name":"Life",
+  "description":"Conway's Game of Life",
+  "version":"1.0",
+  "icons":{
+    "16":"icon_16.png",
+    "48":"icon_48.png",
+    "128":"icon_128.png"
+  },
+  "installs_allowed_from":[
+    "*"
+  ],
+  "developer":{
+    "name":"Dethe Elza",
+    "url":"http://livingcode.org/"
+  }
+}
